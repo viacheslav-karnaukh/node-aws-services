@@ -1,0 +1,278 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "version" : "2020-11-01T16:38:59Z",
+    "title" : "Product service API"
+  },
+  "host" : "cc3mwqo2y1.execute-api.eu-west-1.amazonaws.com",
+  "basePath" : "/dev",
+  "schemes" : [ "https" ],
+  "paths" : {
+    "/" : {
+      "get" : {
+        "produces" : [ "text/plain" ],
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "schema" : {
+              "$ref" : "#/definitions/TextPlainMessage"
+            },
+            "headers" : {
+              "Access-Control-Allow-Origin" : {
+                "type" : "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "type" : "aws_proxy",
+          "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:848564091653:function:product-service-dev-getAvailableApiRoutes/invocations",
+          "passthroughBehavior" : "when_no_match",
+          "httpMethod" : "POST"
+        }
+      }
+    },
+    "/joke" : {
+      "get" : {
+        "produces" : [ "text/plain" ],
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "schema" : {
+              "$ref" : "#/definitions/TextPlainMessage"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "type" : "aws_proxy",
+          "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:848564091653:function:product-service-dev-getJoke/invocations",
+          "passthroughBehavior" : "when_no_match",
+          "httpMethod" : "POST"
+        }
+      }
+    },
+    "/products" : {
+      "get" : {
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "schema" : {
+              "$ref" : "#/definitions/ProductsList"
+            },
+            "headers" : {
+              "Access-Control-Allow-Origin" : {
+                "type" : "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "type" : "aws_proxy",
+          "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:848564091653:function:product-service-dev-getProductsList/invocations",
+          "passthroughBehavior" : "when_no_match",
+          "httpMethod" : "POST"
+        }
+      }
+    },
+    "/products/{productId}" : {
+      "get" : {
+        "produces" : [ "text/plain", "application/json" ],
+        "parameters" : [ {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "ID of product to return",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "schema" : {
+              "$ref" : "#/definitions/Product"
+            },
+            "headers" : {
+              "Access-Control-Allow-Origin" : {
+                "type" : "string"
+              }
+            }
+          },
+          "404" : {
+            "description" : "404 response",
+            "schema" : {
+              "$ref" : "#/definitions/ProductNotFound"
+            },
+            "headers" : {
+              "Access-Control-Allow-Origin" : {
+                "type" : "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "type" : "aws_proxy",
+          "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:848564091653:function:product-service-dev-getProductsById/invocations",
+          "passthroughBehavior" : "when_no_match",
+          "httpMethod" : "POST"
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "ProductNotFound" : {
+      "type" : "string",
+      "title" : "ProductNotFound Schema"
+    },
+    "TextPlainMessage" : {
+      "type" : "string",
+      "title" : "TextPlainMessage Schema"
+    },
+    "Product" : {
+      "type" : "object",
+      "properties" : {
+        "count" : {
+          "type" : "number"
+        },
+        "description" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        },
+        "price" : {
+          "type" : "number"
+        },
+        "title" : {
+          "type" : "string"
+        }
+      },
+      "title" : "Product Schema"
+    },
+    "ProductsList" : {
+      "title" : "ProductList Schema",
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/definitions/Product"
+      }
+    }
+  },
+  "x-amazon-apigateway-documentation" : {
+    "version" : "q7",
+    "createdDate" : "2020-10-31T12:05:31Z",
+    "documentationParts" : [ {
+      "location" : {
+        "type" : "API"
+      },
+      "properties" : {
+        "info" : {
+          "version" : "1",
+          "title" : "dev-product-service"
+        }
+      }
+    }, {
+      "location" : {
+        "type" : "MODEL",
+        "name" : "Joke"
+      },
+      "properties" : {
+        "title" : "Joke Schema"
+      }
+    }, {
+      "location" : {
+        "type" : "MODEL",
+        "name" : "Product"
+      },
+      "properties" : {
+        "title" : "Product Schema"
+      }
+    }, {
+      "location" : {
+        "type" : "MODEL",
+        "name" : "ProductNotFound"
+      },
+      "properties" : {
+        "title" : "ProductNotFound Schema"
+      }
+    }, {
+      "location" : {
+        "type" : "MODEL",
+        "name" : "ProductsList"
+      },
+      "properties" : {
+        "title" : "ProductList Schema"
+      }
+    }, {
+      "location" : {
+        "type" : "MODEL",
+        "name" : "TextPlainMessage"
+      },
+      "properties" : {
+        "title" : "TextPlainMessage Schema"
+      }
+    }, {
+      "location" : {
+        "type" : "PATH_PARAMETER",
+        "path" : "/products/{productId}",
+        "method" : "GET",
+        "name" : "productId"
+      },
+      "properties" : {
+        "description" : "ID of product to return",
+        "name" : "productId",
+        "in" : "path",
+        "type" : "string",
+        "required" : true
+      }
+    }, {
+      "location" : {
+        "type" : "RESPONSE",
+        "method" : "GET",
+        "statusCode" : "200"
+      },
+      "properties" : {
+        "description" : "200 response"
+      }
+    }, {
+      "location" : {
+        "type" : "RESPONSE",
+        "path" : "/joke",
+        "method" : "GET",
+        "statusCode" : "200"
+      },
+      "properties" : {
+        "description" : "200 response"
+      }
+    }, {
+      "location" : {
+        "type" : "RESPONSE",
+        "path" : "/products/{productId}",
+        "method" : "GET",
+        "statusCode" : "200"
+      },
+      "properties" : {
+        "description" : "200 response"
+      }
+    }, {
+      "location" : {
+        "type" : "RESPONSE",
+        "path" : "/products/{productId}",
+        "method" : "GET",
+        "statusCode" : "404"
+      },
+      "properties" : {
+        "description" : "404 response"
+      }
+    }, {
+      "location" : {
+        "type" : "RESPONSE",
+        "path" : "/products",
+        "method" : "GET",
+        "statusCode" : "200"
+      },
+      "properties" : {
+        "description" : "200 response"
+      }
+    } ]
+  },
+  "x-amazon-apigateway-minimum-compression-size" : 1024
+}
