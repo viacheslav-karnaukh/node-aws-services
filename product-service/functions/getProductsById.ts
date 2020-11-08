@@ -9,8 +9,10 @@ export const getProductsById: APIGatewayProxyHandler = async (event: APIGatewayP
   const { productId } = event?.pathParameters || {};
   let product: ProductType;
 
+  console.log('productId -->', productId);
+
   try {
-    product = findProductById(productId);
+    product = await findProductById(productId);
     return {
       statusCode: 200,
       body: JSON.stringify(product),
@@ -18,7 +20,7 @@ export const getProductsById: APIGatewayProxyHandler = async (event: APIGatewayP
   } catch(e) {
     return {
       statusCode: e.statusCode,
-      body: e.message,
+      body: e.message || 500,
     }
   }
 }

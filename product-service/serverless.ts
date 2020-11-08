@@ -1,4 +1,23 @@
 import type { Serverless } from 'serverless/aws';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const {
+  PGUSER,
+  PGHOST,
+  PGDATABASE,
+  PGPASSWORD,
+  PGPORT,
+} = process.env;
+
+const pgEnv = {
+  PGUSER,
+  PGHOST,
+  PGDATABASE,
+  PGPASSWORD,
+  PGPORT,
+};
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -32,6 +51,7 @@ const serverlessConfiguration: Serverless = {
   functions: {
     getProductsList: {
       handler: 'handler.getProductsList',
+      environment: pgEnv,
       events: [
         {
           http: {
@@ -40,10 +60,11 @@ const serverlessConfiguration: Serverless = {
             cors: true,
           }
         }
-      ]
+      ],
     },
     getProductsById: {
       handler: 'handler.getProductsById',
+      environment: pgEnv,
       events: [
         {
           http: {
@@ -61,13 +82,15 @@ const serverlessConfiguration: Serverless = {
         }
       ]
     },
-    getJoke: {
-      handler: 'handler.getJoke',
+    addProduct: {
+      handler: 'handler.addProduct',
+      environment: pgEnv,
       events: [
         {
           http: {
-            method: 'get',
-            path: 'joke',
+            method: 'post',
+            path: 'products',
+            cors: true,
           }
         }
       ]
