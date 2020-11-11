@@ -7,6 +7,9 @@ import swagger from '../swagger-dev.json';
 
 const getAvailableApiRoutes: APIGatewayProxyHandler = async (): Promise<APIGatewayProxyResult> => {
   const paths = Object.keys(swagger.paths);
+
+  console.log('swagger paths -->', paths);
+
   return {
     statusCode: 200,
     body: `Available paths:\n${paths.join('\n')}`,

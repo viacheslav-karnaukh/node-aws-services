@@ -6,10 +6,19 @@ import 'source-map-support/register';
 import { findAllProducts } from '../model/productsModel';
 
 export const getProductsList: APIGatewayProxyHandler = async (): Promise<APIGatewayProxyResult> => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify(findAllProducts()),
-  };
+  let result;
+  try {
+    result = await findAllProducts();
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result),
+    };
+  } catch(e) {
+    return {
+      statusCode: e.statusCode || 500,
+      body: e.message,
+    };
+  }
 }
 
 export default middy(getProductsList).use(cors());

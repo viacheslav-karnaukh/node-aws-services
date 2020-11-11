@@ -1,7 +1,7 @@
 {
   "swagger" : "2.0",
   "info" : {
-    "version" : "2020-11-01T16:38:59Z",
+    "version" : "2020-11-08T14:59:18Z",
     "title" : "Product service API"
   },
   "host" : "cc3mwqo2y1.execute-api.eu-west-1.amazonaws.com",
@@ -25,29 +25,10 @@
           }
         },
         "x-amazon-apigateway-integration" : {
-          "type" : "aws_proxy",
           "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:848564091653:function:product-service-dev-getAvailableApiRoutes/invocations",
           "passthroughBehavior" : "when_no_match",
-          "httpMethod" : "POST"
-        }
-      }
-    },
-    "/joke" : {
-      "get" : {
-        "produces" : [ "text/plain" ],
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "schema" : {
-              "$ref" : "#/definitions/TextPlainMessage"
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "type" : "aws_proxy",
-          "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:848564091653:function:product-service-dev-getJoke/invocations",
-          "passthroughBehavior" : "when_no_match",
-          "httpMethod" : "POST"
+          "httpMethod" : "POST",
+          "type" : "aws_proxy"
         }
       }
     },
@@ -68,10 +49,47 @@
           }
         },
         "x-amazon-apigateway-integration" : {
-          "type" : "aws_proxy",
           "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:848564091653:function:product-service-dev-getProductsList/invocations",
           "passthroughBehavior" : "when_no_match",
-          "httpMethod" : "POST"
+          "httpMethod" : "POST",
+          "type" : "aws_proxy"
+        }
+      },
+      "post" : {
+        "consumes" : [ "application/json" ],
+        "produces" : [ "text/plain", "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "CreatingProduct",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/CreatingProduct"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "201 response",
+            "schema" : {
+              "$ref" : "#/definitions/Product"
+            },
+            "headers" : {
+              "Access-Control-Allow-Origin" : {
+                "type" : "string"
+              }
+            }
+          },
+          "400" : {
+            "description" : "400 response",
+            "schema" : {
+              "$ref" : "#/definitions/TextPlainMessage"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:848564091653:function:product-service-dev-addProduct/invocations",
+          "passthroughBehavior" : "when_no_match",
+          "httpMethod" : "POST",
+          "type" : "aws_proxy"
         }
       }
     },
@@ -110,10 +128,10 @@
           }
         },
         "x-amazon-apigateway-integration" : {
-          "type" : "aws_proxy",
           "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:848564091653:function:product-service-dev-getProductsById/invocations",
           "passthroughBehavior" : "when_no_match",
-          "httpMethod" : "POST"
+          "httpMethod" : "POST",
+          "type" : "aws_proxy"
         }
       }
     }
@@ -154,6 +172,25 @@
       "items" : {
         "$ref" : "#/definitions/Product"
       }
+    },
+    "CreatingProduct" : {
+      "type" : "object",
+      "required" : [ "title" ],
+      "properties" : {
+        "count" : {
+          "type" : "number"
+        },
+        "description" : {
+          "type" : "string"
+        },
+        "price" : {
+          "type" : "number"
+        },
+        "title" : {
+          "type" : "string"
+        }
+      },
+      "title" : "Product Schema"
     }
   },
   "x-amazon-apigateway-documentation" : {
