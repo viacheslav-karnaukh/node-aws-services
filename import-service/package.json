@@ -1,0 +1,35 @@
+{
+  "name": "import-service",
+  "version": "1.0.0",
+  "description": "Serverless webpack example using Typescript",
+  "main": "handler.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "@middy/core": "^1.4.0",
+    "@middy/http-cors": "^1.4.0",
+    "@types/aws-lambda": "^8.10.17",
+    "@types/jest": "^26.0.15",
+    "aws-sdk": "^2.792.0",
+    "csv-parser": "^2.3.3",
+    "dotenv": "^8.2.0",
+    "source-map-support": "^0.5.10"
+  },
+  "devDependencies": {
+    "@types/node": "^10.17.44",
+    "@types/serverless": "^1.72.5",
+    "aws-sdk-mock": "^5.1.0",
+    "fork-ts-checker-webpack-plugin": "^3.0.1",
+    "jest": "^26.6.3",
+    "serverless-webpack": "^5.2.0",
+    "ts-jest": "^26.4.4",
+    "ts-loader": "^5.3.3",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.2.4",
+    "webpack": "^4.29.0",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "author": "The serverless webpack authors (https://github.com/elastic-coders/serverless-webpack)",
+  "license": "MIT"
+}
