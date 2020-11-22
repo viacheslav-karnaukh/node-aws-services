@@ -1,4 +1,4 @@
-import type { Serverless } from 'serverless/aws';
+import type { CloudFormationResources, Serverless } from 'serverless/aws';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -9,6 +9,8 @@ const {
   PGDATABASE,
   PGPASSWORD,
   PGPORT,
+  PRODUCTS_SUBSCRIPTION_EMAIL,
+  EXPENSIVE_PRODUCTS_SUBSCRIPTION_EMAIL,
 } = process.env;
 
 const pgEnv = {
@@ -17,6 +19,48 @@ const pgEnv = {
   PGDATABASE,
   PGPASSWORD,
   PGPORT,
+};
+
+const resources: CloudFormationResources = {
+  CatalogItemsQueue: {
+    Type: 'AWS::SQS::Queue',
+    Properties: {
+      QueueName: 'catalogItemsQueue'
+    }
+  },
+  CreateProductTopic: {
+    Type: 'AWS::SNS::Topic',
+    Properties: {
+      TopicName: 'createProductTopic'
+    }
+  },
+  CreateProductTopicSubscription: {
+    Type: 'AWS::SNS::Subscription',
+    Properties: {
+      Protocol: 'email',
+      Endpoint: PRODUCTS_SUBSCRIPTION_EMAIL,
+      TopicArn: {
+        Ref: 'CreateProductTopic'
+      }
+    }
+  },
+  CreateExpensiveProductTopicSubscription: {
+    Type: 'AWS::SNS::Subscription',
+    Properties: {
+      Protocol: 'email',
+      Endpoint: EXPENSIVE_PRODUCTS_SUBSCRIPTION_EMAIL,
+      TopicArn: {
+        Ref: 'CreateProductTopic'
+      },
+      FilterPolicy: {
+        highestPrice: [
+          {
+            numeric: ['>=', 100]
+          }
+        ]
+      }
+    }
+  }
 };
 
 const serverlessConfiguration: Serverless = {
@@ -41,6 +85,22 @@ const serverlessConfiguration: Serverless = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
     },
+    iamRoleStatements: [
+      {
+        Effect: 'Allow',
+        Action: 'sqs:ReceiveMessage',
+        Resource: {
+          'Fn::GetAtt': [ 'CatalogItemsQueue', 'Arn' ]
+        }
+      },
+      {
+        Effect: 'Allow',
+        Action: 'sns:Publish',
+        Resource: {
+          Ref: 'CreateProductTopic'
+        }
+      }
+    ]
   },
   custom: {
     webpack: {
@@ -106,7 +166,51 @@ const serverlessConfiguration: Serverless = {
           }
         }
       ]
+    },
+    catalogBatchProcess: {
+      handler: 'handler.catalogBatchProcess',
+      environment: {
+        ...pgEnv,
+        CREATE_PRODUCT_TOPIC_ARN: {
+          Ref: 'CreateProductTopic'
+        }
+      },
+      events: [
+        {
+          sqs: {
+            arn: {
+              'Fn::GetAtt': [ 'CatalogItemsQueue', 'Arn' ]
+            },
+            batchSize: 5
+          }
+        }
+      ]
     }
+  },
+  resources: {
+    Resources: resources,
+    Outputs: {
+      QueueURL: {
+        Value: {
+          Ref: 'CatalogItemsQueue'
+         },
+         Export: {
+           Name: {
+             'Fn::Sub': '${AWS::StackName}-CatalogItemsQueueUrl'
+           }
+         }
+      },
+      QueueARN: {
+        Value: {
+          'Fn::GetAtt': [ 'CatalogItemsQueue', 'Arn' ]
+         },
+         Export: {
+           Name: {
+            'Fn::Sub': '${AWS::StackName}-CatalogItemsQueueArn'
+           }
+         }
+      }
+   }
   }
 }
 

@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "lib": ["es2017"],
+    "lib": ["es2020"],
     "removeComments": true,
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,
-    "target": "es2017",
+    "target": "es2020",
     "outDir": "lib",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
