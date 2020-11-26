@@ -6,7 +6,7 @@ import 'source-map-support/register';
 import { findProductById, ProductType } from '../model/productsModel';
 
 export const getProductsById: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const { productId } = event?.pathParameters || {};
+  const { productId } = event.pathParameters || {};
   let product: ProductType;
 
   console.log('productId -->', productId);

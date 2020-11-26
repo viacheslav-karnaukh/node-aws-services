@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const { IMPORT_PRODUCTS_BUCKET } = process.env;
+const STAGE = process.env.STAGE || 'dev';
+const PRODUCT_SERVICE_STACK_NAME = `product-service-${STAGE}`;
 const IMPORT_PRODUCTS_BUCKET_ARN = `arn:aws:s3:::${IMPORT_PRODUCTS_BUCKET}`;
 const bucketEnv = { IMPORT_PRODUCTS_BUCKET };
 
@@ -62,13 +64,16 @@ const serverlessConfiguration: Serverless = {
   provider: {
     name: 'aws',
     runtime: 'nodejs12.x',
-    stage: 'dev',
+    stage: STAGE,
     region: 'eu-west-1',
     apiGateway: {
       minimumCompressionSize: 1024,
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      CATALOG_ITEMS_QUEUE_URL: {
+        'Fn::ImportValue': `${PRODUCT_SERVICE_STACK_NAME}-CatalogItemsQueueUrl`,
+      }
     },
     iamRoleStatements: [
       {
@@ -80,6 +85,13 @@ const serverlessConfiguration: Serverless = {
         Effect: 'Allow',
         Action: 's3:*',
         Resource: `${IMPORT_PRODUCTS_BUCKET_ARN}/*`,
+      },
+      {
+        Effect: 'Allow',
+        Action: 'sqs:SendMessage',
+        Resource: {
+          'Fn::ImportValue': `${PRODUCT_SERVICE_STACK_NAME}-CatalogItemsQueueArn`,
+        }
       }
     ]
   },

@@ -4,6 +4,20 @@ import { getProductsById } from '../functions/getProductsById';
 const EXISTING_PRODUCT_ID = '7567ec4b-b10c-48c5-9345-fc73c48a80aa';
 const NON_EXISTING_PRODUCT_ID = 'product-does-not-exist';
 
+jest.mock('pg', () => ({
+  Client: jest.fn(() => ({
+      connect: jest.fn(),
+      query: jest.fn().mockImplementation(() => ({
+          rows: [
+            {
+              id: EXISTING_PRODUCT_ID
+            }
+          ],
+      })),
+      end: jest.fn(),
+  })),
+}));
+
 const getHandlerResponse = async (productId?: string): Promise<APIGatewayProxyResult> => {
   const event = {
     pathParameters: { productId: productId }

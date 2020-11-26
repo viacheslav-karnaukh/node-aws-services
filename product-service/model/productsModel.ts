@@ -82,17 +82,14 @@ export const findProductById = async (id: string): Promise<ProductType> => {
   }
 };
 
-export const insertProduct = async ({
+const runInsertTransaction = async (dbClient: Client, {
   count,
   description,
   price,
   title
 }: ProductType): Promise<ProductType> => {
-  const client = new Client(dbOptions);
-  await client.connect();
-
   try {
-    await client.query(sql`begin`);
+    await dbClient.query(sql`begin`);
     const insertProductQuery = sql`
       insert into products (title, description, price)
       values($1, $2, $3) returning id;
@@ -101,14 +98,14 @@ export const insertProduct = async ({
       insert into stocks (product_id, count)
       values($1, $2)
     `;
-    const { id } = (await client.query(insertProductQuery, [
+    const { id } = (await dbClient.query(insertProductQuery, [
       title,
       description,
       price
     ])).rows[0];
 
-    await client.query(insertStockQuery, [id, count]);
-    await client.query(sql`commit`);
+    await dbClient.query(insertStockQuery, [id, count]);
+    await dbClient.query(sql`commit`);
 
     return {
       id,
@@ -118,9 +115,51 @@ export const insertProduct = async ({
       title
     };
   } catch(e) {
-    await client.query(sql`rollback`);
+    await dbClient.query(sql`rollback`);
+    throw new ProductsModelError(e.message, 500);
+  }
+};
+
+export const insertProduct = async (product: ProductType): Promise<ProductType> => {
+  const dbClient = new Client(dbOptions);
+  await dbClient.connect();
+
+  try {
+    const createdProduct = await runInsertTransaction(dbClient, product);
+    return createdProduct;
+  } catch(e) {
+    await dbClient.query(sql`rollback`);
     throw new ProductsModelError(e.message, 500);
   } finally {
-    await client.end();
+    await dbClient.end();
+  }
+};
+
+export const insertProducts = async (products: ProductType[]) => {
+  const dbClient = new Client(dbOptions);
+  await dbClient.connect();
+
+  const batchTransactionsResults = await Promise.allSettled(products.map(async (product) => {
+    try {
+      await runInsertTransaction(dbClient, product);
+    } catch(e) {
+      throw {
+        message: e.message,
+        product,
+      };
+    }
+  })).catch((e) => e);
+
+  const failedRecordsData = batchTransactionsResults.filter(({ status }) => status === 'rejected');
+
+  try {
+    if(failedRecordsData.length) {
+      throw {
+        message: 'Some records were not inserted',
+        failedRecordsData: failedRecordsData.map((failedRecord) => JSON.stringify(failedRecord.reason))
+      };
+    }
+  } finally {
+    await dbClient.end();
   }
 };
