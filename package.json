@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "service:create": "sls create --template aws-nodejs-typescript --path"
+  }
+}

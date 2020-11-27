@@ -1,5 +1,10 @@
 # node-aws-services
 
+### New service creation
+```
+npm run service:create -- <service_name>
+```
+
 ### Swagger documentation
 https://petstore.swagger.io/?url=https://raw.githubusercontent.com/viacheslav-karnaukh/node-aws-services/task-4/product-service/swagger-dev.json
 
