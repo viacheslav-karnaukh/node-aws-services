@@ -1,13 +1,31 @@
 import type { CloudFormationResources, Serverless, ResourcePolicy } from 'serverless/aws';
 import dotenv from 'dotenv';
+import { GatewayResponseType } from 'aws-sdk/clients/apigateway';
 
 dotenv.config();
 
 const { IMPORT_PRODUCTS_BUCKET } = process.env;
 const STAGE = process.env.STAGE || 'dev';
 const PRODUCT_SERVICE_STACK_NAME = `product-service-${STAGE}`;
+const AUTHORIZATION_SERVICE_STACK_NAME = `authorization-service-${STAGE}`;
 const IMPORT_PRODUCTS_BUCKET_ARN = `arn:aws:s3:::${IMPORT_PRODUCTS_BUCKET}`;
 const bucketEnv = { IMPORT_PRODUCTS_BUCKET };
+
+const enableGatewayResponseCors = (responseType: GatewayResponseType) => {
+  return {
+    Type: 'AWS::ApiGateway::GatewayResponse',
+    Properties: {
+      RestApiId: {
+        Ref: 'ApiGatewayRestApi'
+      },
+      ResponseParameters: {
+        'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+        'gatewayresponse.header.Access-Control-Allow-Headers': "'*'"
+      },
+      ResponseType: responseType
+    }
+  };
+};
 
 const resources: CloudFormationResources = {
   UploadBucket: {
@@ -43,6 +61,16 @@ const resources: CloudFormationResources = {
       },
     },
   },
+  ApiGatewayRestApi: {
+    Type: 'AWS::ApiGateway::RestApi',
+    Properties: {
+      Name: {
+        'Fn::Sub': '${AWS::StackName}'
+      },
+    }
+  },
+  ResponseUnauthorized: enableGatewayResponseCors('UNAUTHORIZED'),
+  ResponseAccessDenied: enableGatewayResponseCors('ACCESS_DENIED'),
 };
 
 const serverlessConfiguration: Serverless = {
@@ -114,7 +142,15 @@ const serverlessConfiguration: Serverless = {
                   'Access-Control-Allow-Origin': true
                 }
               }
-            }
+            },
+            authorizer: {
+              name: 'basicAuhorizer',
+              arn: {
+                'Fn::ImportValue': `${AUTHORIZATION_SERVICE_STACK_NAME}-BasicAuthorizerArn`
+              } as any,
+              resultTtlInSeconds: 0,
+              identitySource: 'method.request.header.Authorization',
+            },
           }
         }
       ]
