@@ -1,0 +1,22 @@
+{
+  "name": "bff-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "eb:init": "eb init viacheslav-karnaukh-bff-api -p node.js -r eu-west-1",
+    "eb:create": "eb create development --single --cname viacheslav-karnaukh-bff-api-development",
+    "eb:getenv": "node -p \"require('fs').readFileSync('.env').toString().replace(/\\r?\\n/g, ' ')\"",
+    "eb:deploy": "eb deploy --staged"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  }
+}
